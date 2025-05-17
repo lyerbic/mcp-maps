@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   // Check if the message is asking about project sites or maps
   if (userMessage.toLowerCase().includes("project site") || userMessage.toLowerCase().includes("map")) {
     try {
-      const mcpRes = await fetch('https://your-vercel-app.vercel.app/api/sites');
+      const mcpRes = await fetch(`${req.headers.origin}/api/sites`);
       const sites = await mcpRes.json();
       const summary = sites.map(site => `• ${site.name} (${site.lat}, ${site.lng})`).join('\n');
       return res.status(200).json({
