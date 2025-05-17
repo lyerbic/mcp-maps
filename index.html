@@ -5,21 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Claude Agent</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
 </head>
-<body class="bg-gray-50 flex items-center justify-center min-h-screen">
-  <div id="chat" class="bg-white p-4 rounded-2xl shadow-md max-w-md w-full">
+<body class="bg-gray-50 flex flex-col items-center justify-center min-h-screen">
+  <div id="chat" class="bg-white p-4 rounded-2xl shadow-md max-w-md w-full mb-4">
     <div id="messages" class="space-y-2 max-h-64 overflow-y-auto text-sm"></div>
     <input id="input" class="mt-2 w-full border rounded px-3 py-2" placeholder="Ask me anything..." />
   </div>
 
+  <div id="map" class="w-full max-w-md h-64 rounded shadow"></div>
+
   <script>
     const input = document.getElementById('input');
     const messages = document.getElementById('messages');
+    const mapEl = document.getElementById('map');
+    let map;
+
+    function initMap(sites) {
+      if (!map) {
+        map = new google.maps.Map(mapEl, {
+          center: { lat: 51.509865, lng: -0.118092 },
+          zoom: 12
+        });
+      }
+      sites.forEach(site => {
+        new google.maps.Marker({
+          position: { lat: site.lat, lng: site.lng },
+          map,
+          title: site.name
+        });
+      });
+    }
 
     input.addEventListener('keypress', async (e) => {
       if (e.key === 'Enter') {
         const msg = input.value;
-        messages.innerHTML += `<div class="text-right text-blue-600">You: ${msg}</div>`;
+        messages.innerHTML += `<div class=\"text-right text-blue-600\">You: ${msg}</div>`;
         input.value = '';
 
         const res = await fetch('/api/chat', {
@@ -28,8 +49,10 @@
           body: JSON.stringify({ message: msg })
         });
         const data = await res.json();
-        messages.innerHTML += `<div class="text-left text-gray-800">Agent: ${data.reply}</div>`;
+        messages.innerHTML += `<div class=\"text-left text-gray-800\">Agent: ${data.reply}</div>`;
         messages.scrollTop = messages.scrollHeight;
+
+        if (data.sites) initMap(data.sites);
       }
     });
   </script>
