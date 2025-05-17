@@ -19,7 +19,7 @@
     input.addEventListener('keypress', async (e) => {
       if (e.key === 'Enter') {
         const msg = input.value;
-        messages.innerHTML += `<div class="text-right text-blue-600">You: ${msg}</div>`;
+        messages.innerHTML += `<div class=\"text-right text-blue-600\">You: ${msg}</div>`;
         input.value = '';
 
         const res = await fetch('/api/chat', {
@@ -28,7 +28,7 @@
           body: JSON.stringify({ message: msg })
         });
         const data = await res.json();
-        messages.innerHTML += `<div class="text-left text-gray-800">Agent: ${data.reply}</div>`;
+        messages.innerHTML += `<div class=\"text-left text-gray-800\">Agent: ${data.reply}</div>`;
         messages.scrollTop = messages.scrollHeight;
       }
     });
